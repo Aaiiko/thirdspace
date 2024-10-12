@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/** Toolbar Styling **/
+.toolbar {
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  padding: 10px;
+  background: lightgray;
+  color: black;
+}
+
+
+
+
+
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
