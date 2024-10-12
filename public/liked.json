@@ -7,8 +7,8 @@
             "price": 3,
             "location": "123 Main St, Springfield",
             "category": "Greek",
-            "image": "https://images.squarespace-cdn.com/content/v1/5e484ab628c78d6f7e602d73/c828d00f-3184-44d0-9109-eea1b960075d/greek-foods-souvlaki.jpg",
-            "id": "1"
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
         },
         {
             "name": "Pasta Palace",
@@ -17,8 +17,8 @@
             "price": 2,
             "location": "456 Elm St, Springfield",
             "category": "Italian",
-            "image": "https://images.unsplash.com/photo-1589308078054-832d9d2d6d1b",
-            "id": "2"
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
         },
         {
             "name": "Sushi World",
@@ -27,8 +27,8 @@
             "price": 4,
             "location": "789 Oak St, Springfield",
             "category": "Japanese",
-            "image": "https://images.unsplash.com/photo-1553621042-f6e147245754",
-            "id": "3"
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
         },
         {
             "name": "Burger Barn",
@@ -37,8 +37,8 @@
             "price": 1,
             "location": "101 Maple St, Springfield",
             "category": "American",
-            "image": "https://images.unsplash.com/photo-1550547660-d9450f859349",
-            "id": "4"
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
         },
         {
             "name": "Curry House",
@@ -47,8 +47,8 @@
             "price": 3,
             "location": "202 Pine St, Springfield",
             "category": "Indian",
-            "image": "https://images.unsplash.com/photo-1604908177525-1b6ecb7b6f8b",
-            "id": "5"
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
         },
         {
             "name": "Taco Town",
@@ -57,8 +57,8 @@
             "price": 2,
             "location": "303 Cedar St, Springfield",
             "category": "Mexican",
-            "image": "https://images.unsplash.com/photo-1600891964599-f61ba0e24092",
-            "id": "6"
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
         },
         {
             "name": "Vegan Delight",
@@ -67,8 +67,8 @@
             "price": 3,
             "location": "404 Birch St, Springfield",
             "category": "Vegan",
-            "image": "https://images.unsplash.com/photo-1543353071-087092ec393e",
-            "id": "7"
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
         },
         {
             "name": "BBQ Haven",
@@ -77,8 +77,8 @@
             "price": 2,
             "location": "505 Walnut St, Springfield",
             "category": "BBQ",
-            "image": "https://images.unsplash.com/photo-1552332386-f8dd00dc2f85",
-            "id": "8"
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
         }
     ]
 ]
