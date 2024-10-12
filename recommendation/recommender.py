@@ -43,9 +43,9 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
     category_encoded = category_vectorizer.fit_transform(all_data['category'])
     category_df = pd.DataFrame(category_encoded.toarray(), columns=category_vectorizer.get_feature_names_out())
     
-    service_vectorizer = CountVectorizer(tokenizer=lambda x: x.split(','), lowercase=False, token_pattern=None)
-    service_encoded = service_vectorizer.fit_transform(all_data['tags'])
-    service_df = pd.DataFrame(service_encoded.toarray(), columns=service_vectorizer.get_feature_names_out())
+    # service_vectorizer = CountVectorizer(tokenizer=lambda x: x.split(','), lowercase=False, token_pattern=None)
+    # service_encoded = service_vectorizer.fit_transform(all_data['tags'])
+    # service_df = pd.DataFrame(service_encoded.toarray(), columns=service_vectorizer.get_feature_names_out())
     
     scaler = MinMaxScaler()
     all_data['Review_normalized'] = scaler.fit_transform(all_data[['review']])
@@ -58,8 +58,7 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
     
     feature_df = pd.concat([
         all_data[['Review_normalized', 'Price_similarity']].reset_index(drop=True),
-        category_df.reset_index(drop=True),
-        service_df.reset_index(drop=True)
+        category_df.reset_index(drop=True)
     ], axis=1)
 
     feature_df.drop_duplicates(inplace=True)
@@ -72,8 +71,7 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
             feature_weights['Price_normalized'],
             # feature_weights['star_diff_normalized'],
             # feature_weights['Area_encoded'],
-            *([1] * category_df.shape[1]),
-            *([1] * service_df.shape[1])
+            *([1] * category_df.shape[1])
         ]).unsqueeze(0)
 
         features_tensor *= weight_tensor
@@ -165,11 +163,11 @@ def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restau
     indices = torch.multinomial(probabilities, num_samples=num_samples, replacement=False)
     _, indices = torch.sort(similarities, descending=True)
 
-    seen_restaurants = set(user_likes['Name']).union(set(user_dislikes['Name']))
+    seen_restaurants = set(user_likes['name']).union(set(user_dislikes['name']))
     final_indices = []
     
     for idx in indices:
-        restaurant_name = all_restaurants.iloc[idx.item()]['Name']
+        restaurant_name = all_restaurants.iloc[idx.item()]['name']
         if restaurant_name not in seen_restaurants and idx.item() not in final_indices:
             final_indices.append(idx.item())
             if len(final_indices) == top_k:
@@ -181,7 +179,7 @@ def generate_dummy_data():
     np.random.seed(43)  # For reproducibility
 
     restaurants = pd.DataFrame({
-        'Name': [f'Restaurant_{i}' for i in range(15)],
+        'name': [f'Restaurant_{i}' for i in range(15)],
         'review': np.random.uniform(3, 5, 15).round(1),
         'price': np.random.randint(1, 5, 15),
         'category': np.random.choice(['Italian', 'Chinese', 'Mexican', 'American', 'Japanese'], 15),
@@ -191,8 +189,8 @@ def generate_dummy_data():
     })
 
     user_likes = restaurants.sample(n=3)
-    user_dislikes = restaurants[~restaurants['Name'].isin(user_likes['Name'])].sample(n=2)
-    all_restaurants = restaurants[~restaurants['Name'].isin(user_likes['Name']) & ~restaurants['Name'].isin(user_dislikes['Name'])]
+    user_dislikes = restaurants[~restaurants['name'].isin(user_likes['name'])].sample(n=2)
+    all_restaurants = restaurants[~restaurants['name'].isin(user_likes['name']) & ~restaurants['name'].isin(user_dislikes['name'])]
     print(user_likes)
     print(user_dislikes)
     return user_likes, user_dislikes, all_restaurants
@@ -226,7 +224,7 @@ def main():
 
     # Adjust top k based on how often we retrain
     recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, processed_data, top_k=5)
-    print(recommendations[['Name', 'review', 'price', 'location', 'category', 'tags', 'Searched City']])
+    print(recommendations[['name', 'review', 'price', 'location', 'category', 'tags', 'Searched City']])
 
     # READ IN NEW DATA
     # model = retrain_model(model, graph_data, lr=0.01, weight_decay=0.001)
