@@ -60,7 +60,11 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
     /** The event that happens on a right swipe */
     const rightSwipe = () => {
         const lovedBusiness = props.businesses[currentB];
-        setLoved([...loved, lovedBusiness]);
+        if (loved.length === undefined){
+            setLoved([lovedBusiness]);
+        } else {
+            setLoved([...loved, lovedBusiness]);
+        }
         saveLovedBusiness(lovedBusiness);
         if (currentB === props.businesses.length - 1) {
             setCurrentB(-1);
@@ -72,7 +76,11 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
     /** The event that happens on a left swipe */
     const leftSwipe = () => {
         const rejectedBusiness = props.businesses[currentB];
-        setRejected([...rejected, rejectedBusiness]);
+        if (rejected.length === undefined){
+            setRejected([rejectedBusiness]);
+        } else {
+            setRejected([...rejected, rejectedBusiness]);
+        }
         saveRejectedBusiness(rejectedBusiness);
         if (currentB === props.businesses.length - 1) {
             setCurrentB(-1);
@@ -101,12 +109,11 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
 
     useEffect(() => {
         const loadBusinesses = async () => {
-            const lovedBusinesses = await readLovedBusinesses();
-            const rejectedBusinesses = await readRejectedBusinesses();
+            const lovedBusinesses : Business[] = await readLovedBusinesses();
+            const rejectedBusinesses : Business[] = await readRejectedBusinesses();
             setLoved(lovedBusinesses);
             setRejected(rejectedBusinesses);
         };
-
         loadBusinesses();
     }, []);
 
@@ -117,15 +124,14 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
                 <h1>You&apos;ve seen all the businesses in your area!</h1>
                 <p className="font-work-sans-regular text-4xl">Loved</p>
                 {loved.map((business) => (
-                    <BusinessCard {...business} key={business.id}/>
+                    <BusinessCard {...business}/>
                 ))}
                 <p className="font-work-sans-regular text-4xl">Rejected</p>
                 {rejected.map((business) => (
-                    <BusinessCard {...business} key={business.id}/>
+                    <BusinessCard {...business}/>
                 ))}
             </div>
         );
-
     }
 
     return (
