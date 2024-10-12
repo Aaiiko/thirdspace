@@ -3,6 +3,9 @@
 import { Business } from "@/types/BusinessTypes";
 import React, { useState, useRef } from "react";
 import { BusinessCard } from "./BusinessCard";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 
 
 
@@ -77,21 +80,22 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
 
     return (
         <div
-            className="relative min-h-screen"
+            className="relative min-h-screen w-full"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
             <BusinessCard {...props.businesses[currentB]} />
-            <div className="button-container flex justify-between sticky bottom-0 left-0 right-0 p-4 bg-[#f4f4f4]">
+            <div className="flex justify-between fixed bottom-0 left-0 right-0 p-4 bg-[#f4f4f4] z-50">
                 <div>
-                    <button onClick={leftSwipe} className="bg-black text-white py-2 px-4 rounded hover:bg-gray-700">
-                        Left Swipe
+                    <button onClick={leftSwipe} className="bg-red-500 text-white py-2 px-4 rounded hover:bg-gray-700">
+                        <ArrowBackIcon/><ClearIcon />
                     </button>
                 </div>
+                <p className="font-bold">Swipe left or right</p>
                 <div>
-                    <button onClick={rightSwipe} className="bg-black text-white py-2 px-4 rounded hover:bg-gray-700">
-                        Right Swipe
+                    <button onClick={rightSwipe} className="bg-green-500 text-white py-2 px-4 rounded hover:bg-gray-700">
+                        <CheckIcon/><ArrowBackIcon style={{ transform: 'rotate(180deg)' }} />
                     </button>
                 </div>
             </div>

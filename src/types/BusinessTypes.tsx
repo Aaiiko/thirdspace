@@ -12,7 +12,7 @@ export type Business = {
     location : string;
     /** The catagory of restraunt (i.e. Greek, Pizza, etc.) */
     catagory : string;
-    /** */
+    /**  */
     image : string|null;
     /** Business id */
     id : string;

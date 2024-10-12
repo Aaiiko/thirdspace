@@ -15,9 +15,10 @@ export default function Home() {
     <div className="bg-[#f4f4f4]">
       <Toolbar />
       <div className="py-20 flex flex-col items-center justify-center">
-        <img src="/Phantom.svg" alt="Third Space Logo" className="w-1/3" />
+        <img src="/Phantom.svg" alt="Third Space Logo" style={{height: "200px", width: "400px", 
+          objectFit: "cover", objectPosition: "center"}} />
         <h2 className="text-center py-3 text-3xl font-bold">Welcome to Third Space!</h2>
-        <p>Your one stop shop for all your local eating needs!</p>
+        <h2 className="text-center">Your one stop shop for all your local eating needs!</h2>
         <br></br>
         <Link href="/foryou"><button className="bg-black text-white py-2 px-4 rounded hover:bg-gray-700">
           <p className="text-white">Let&apos;s Get Started!</p>
