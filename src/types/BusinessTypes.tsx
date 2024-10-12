@@ -16,4 +16,6 @@ export type Business = {
     image : string|null;
     /** Business id */
     id : string;
+    /** TODO: Implement Tags */
+    //tags : string[];
 }

@@ -8,6 +8,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import { database } from "@../../../firebaseConfig";
 import { ref, set, get, child } from "firebase/database";
+import { useMediaQuery } from "@mui/material";
 
 
 
@@ -17,6 +18,7 @@ interface BusinessExploreProps {
 }
 
 export const BusinessExplore = (props: BusinessExploreProps) => {
+    const isDesktop = useMediaQuery('(min-width: 1024px)');
     const [currentB, setCurrentB] = useState<number>(0);
     const [rejected, setRejected] = useState<Business[]>([]);
     const [loved, setLoved] = useState<Business[]>([]);
@@ -60,7 +62,7 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
     /** The event that happens on a right swipe */
     const rightSwipe = () => {
         const lovedBusiness = props.businesses[currentB];
-        if (loved.length === undefined){
+        if (loved.length === undefined) {
             setLoved([lovedBusiness]);
         } else {
             setLoved([...loved, lovedBusiness]);
@@ -76,7 +78,7 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
     /** The event that happens on a left swipe */
     const leftSwipe = () => {
         const rejectedBusiness = props.businesses[currentB];
-        if (rejected.length === undefined){
+        if (rejected.length === undefined) {
             setRejected([rejectedBusiness]);
         } else {
             setRejected([...rejected, rejectedBusiness]);
@@ -109,8 +111,8 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
 
     useEffect(() => {
         const loadBusinesses = async () => {
-            const lovedBusinesses : Business[] = await readLovedBusinesses();
-            const rejectedBusinesses : Business[] = await readRejectedBusinesses();
+            const lovedBusinesses: Business[] = await readLovedBusinesses();
+            const rejectedBusinesses: Business[] = await readRejectedBusinesses();
             setLoved(lovedBusinesses);
             setRejected(rejectedBusinesses);
         };
@@ -124,11 +126,11 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
                 <h1>You&apos;ve seen all the businesses in your area!</h1>
                 <p className="font-work-sans-regular text-4xl">Loved</p>
                 {loved.map((business) => (
-                    <BusinessCard {...business}/>
+                    <BusinessCard {...business} />
                 ))}
                 <p className="font-work-sans-regular text-4xl">Rejected</p>
                 {rejected.map((business) => (
-                    <BusinessCard {...business}/>
+                    <BusinessCard {...business} />
                 ))}
             </div>
         );
@@ -142,19 +144,25 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
             onTouchEnd={handleTouchEnd}
         >
             <BusinessCard {...props.businesses[currentB]} />
-            <div className="flex justify-between fixed bottom-0 left-0 right-0 p-4 bg-[#f4f4f4] z-50">
-                <div>
-                    <button onClick={leftSwipe} className="bg-red-500 text-white py-2 px-4 rounded hover:bg-gray-700">
-                        <ArrowBackIcon/><ClearIcon />
-                    </button>
+            <div className="flex justify-between fixed bottom-0 left-0 right-0 p-4 bg-[#8ca9ad] z-50">
+              {isDesktop ? (
+                <div className="flex w-full">
+                  <button onClick={leftSwipe} className="flex-1 bg-red-500 text-white py-2 px-4 rounded hover:bg-gray-700 outline outline-[#f4f4f4]">
+                    <ClearIcon />
+                  </button>
+                  &nbsp;&nbsp;
+                  <button onClick={rightSwipe} className="flex-1 bg-green-500 text-white py-2 px-4 rounded hover:bg-gray-700 outline outline-[#f4f4f4]">
+                    <CheckIcon />
+                  </button>
                 </div>
-                <p className="font-bold">Swipe left or right</p>
-                <div>
-                    <button onClick={rightSwipe} className="bg-green-500 text-white py-2 px-4 rounded hover:bg-gray-700">
-                        <CheckIcon/><ArrowBackIcon style={{ transform: 'rotate(180deg)' }} />
-                    </button>
+              ) : (
+                <div className="flex w-full">
+                  <div className="flex-1 text-center">Left is for losers</div>
+                  <div className="flex-1 text-center">Right is for winners! Tee hee</div>
                 </div>
+              )}
             </div>
+            <div style={{ paddingBottom: "42px" }}></div>
         </div>
     );
 };

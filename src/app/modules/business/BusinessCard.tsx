@@ -22,20 +22,27 @@ export const BusinessCard = (business: Business) => {
                 src={business.image ? business.image : '/Phantom.svg'}
                 alt={business.name}
                 className="w-full object-cover"
-                style={{ height: "300px" }}
+                style={{ height: "600px" }}
                 onError={(e) => { e.currentTarget.src = '/Phantom.svg' }}
             />
             <div className="px-1 py-2">
                 <div>
-                    <h2 className="text-3xl font-bold">{business.name}</h2>
-                    <p className="text-gray-300 font-bold text-md">{business.location}</p>
+                    <h2 className="text-3xl font-bold text-[#365b6d]">{business.name}</h2>
+                    <p className="font-bold text-md text-[#8ca9ad]">{business.location}</p>
                 </div>
-                <p className="font-work-sans-regular">Catagory: {business.category}</p>
+                <p className="font-work-sans-regular text-[#8ca9ad]">Category {business.category}</p>
                 <div className="flex items-center mb-4">
                     {renderStars(business.review)}
-                    <span className="ml-2 text-gray-600">{business.review}</span>
+                    <span className="ml-2 text-gray-600 text-[#8ca9ad]">{business.review}</span>
                 </div>
-                <p className="text-gray-700 mb-6">{business.description}</p>
+                <p className="text-xl text-[#365b6d] font-bold">About</p>
+                <p className="text-[#8ca9ad] mb-6">{business.description}</p>
+                <p className="text-xl text-[#365b6d] font-bold">Tags:</p>
+                <p className="text-[#8ca9ad] mb-6">Robert Loved, Alice Hated, Fergus Approved, Kyle Tolerated</p>
+                {/* {business.tags.map(tag => (
+                    <p className="text-[#8ca9ad] mb-6">{tag}</p>
+                ))} */}
+                
             </div>
 
         </div>
