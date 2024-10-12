@@ -1,6 +1,7 @@
 "use client"
 
 import { BusinessExplore } from "@/app/modules/business/BusinessExplore";
+import Toolbar from "@/app/modules/Toolbar";
 import { Business } from "@/types/BusinessTypes";
 import { Metadata } from "next";
 import { useState, useEffect } from "react";
@@ -21,7 +22,6 @@ export default function forYouPage() {
         };
         fetchBusinesses();
     }, []);
-
 
     return (
         <div className="bg-[#f4f4f4]">

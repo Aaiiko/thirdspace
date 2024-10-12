@@ -1,3 +1,4 @@
+from flask import Flask, requests, jsonify, Response
 import torch
 from torch_geometric.data import Data
 from torch_geometric.nn import GCNConv, Linear
@@ -6,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 import torch.nn.functional as F
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
+
 
 class GNN(torch.nn.Module):
     def __init__(self, num_features, hidden_channels):
@@ -175,61 +177,35 @@ def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restau
 
     return all_restaurants.iloc[final_indices]
 
-def generate_dummy_data():
-    np.random.seed(43)  # For reproducibility
-
-    restaurants = pd.DataFrame({
-        'name': [f'Restaurant_{i}' for i in range(15)],
-        'review': np.random.uniform(3, 5, 15).round(1),
-        'price': np.random.randint(1, 5, 15),
-        'category': np.random.choice(['Italian', 'Chinese', 'Mexican', 'American', 'Japanese'], 15),
-        'tags': [', '.join(np.random.choice(['Delivery', 'Takeout', 'Dine-in'], np.random.randint(1, 4), replace=False)) for _ in range(15)],
-        'location': np.random.choice(['Downtown', 'Suburb', 'Uptown'], 15),
-        'Searched City': 'Seattle'
-    })
-
-    user_likes = restaurants.sample(n=3)
-    user_dislikes = restaurants[~restaurants['name'].isin(user_likes['name'])].sample(n=2)
-    all_restaurants = restaurants[~restaurants['name'].isin(user_likes['name']) & ~restaurants['name'].isin(user_dislikes['name'])]
-    print(user_likes)
-    print(user_dislikes)
-    return user_likes, user_dislikes, all_restaurants
-
-def main():
-    min_stars = 3.0
-    data_file = 'Restaurants_Seattle.csv'
-    likes = 'Sample_User.xlsx'
-    dislikes = 'User_dislikes.xlsx'
-
-    # user_likes = pd.read_excel(likes)
-    # user_dislikes = pd.read_excel(dislikes)
-    # data = pd.read_csv(data_file)
-    # data = data.drop_duplicates()
-
-    user_likes, user_dislikes, data = generate_dummy_data()
-
-    feature_weights = {
-        'Star_normalized': 1.0,
-        'Price_normalized': 2.0,
-        # 'star_diff_normalized': 1.0,
-        # 'Area_encoded': 0.1,
-        'Category': 1.0,
-        'Services': 1.0
-    }
-    features, processed_data = preprocess_data(user_likes, user_dislikes, data, min_stars, feature_weights)
+def get_recommendations_for_user(user_likes, user_dislikes, all_restaurants, min_stars=3.0, feature_weights=None):
+    features, all_data = preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, feature_weights)
     graph_data = create_graph(features, user_likes, user_dislikes)
+    model = GNN(num_features=features.size(1), hidden_channels=32)
+    train_model(model, graph_data)
+    model = retrain_model(model, graph_data)
+    recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, all_restaurants)
+    return recommendations.to_json()
 
-    model = GNN(num_features=features.shape[1], hidden_channels=64)
-    train_model(model, graph_data, lr=0.01, weight_decay=0.001)
 
-    # Adjust top k based on how often we retrain
-    recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, processed_data, top_k=5)
-    print(recommendations[['name', 'review', 'price', 'location', 'category', 'tags', 'Searched City']])
+def update_recommendations(user_likes, user_dislikes, all_restaurants, model, recommendations, feature_weights=None):
+    features, all_data = preprocess_data(user_likes, user_dislikes, all_restaurants, feature_weights)
+    graph_data = create_graph(features, user_likes, user_dislikes)
+    model = retrain_model(model, graph_data)
+    recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, all_restaurants)
+    return recommendations
 
-    # READ IN NEW DATA
-    # model = retrain_model(model, graph_data, lr=0.01, weight_decay=0.001)
-    # recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, processed_data, top_k=10)
-    # print(recommendations[['Name', 'Star', 'Price', 'Area', 'Category', 'Services', 'Searched City']])
+def json_to_df(json_data):
+    return pd.DataFrame(json_data)
 
-if __name__ == "__main__":
-    main()
+app = Flask(__name__)
+
+@app.route('/foryou', methods=['GET'])
+def make_for_you():
+    user_likes = json_to_df(requests.get("http://localhost:3000/liked.json"))
+    user_dislikes = json_to_df(requests.get("http://localhost:3000/rejected.json"))
+    all_restaurants = json_to_df(requests.get("http://localhost:3000/new_businesses.json"))
+    recommendations = get_recommendations_for_user(user_likes, user_dislikes, all_restaurants)
+    return Response(recommendations.to_json(orient="records"), mimetype='application/json')
+
+if __name__ == '__main__':
+    app.run(debug=True)
