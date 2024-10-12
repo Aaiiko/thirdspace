@@ -8,11 +8,14 @@ interface BusinessCardProps {
     };
 }
 
+/** The card displayed on screen! */
 export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
+
+
     return (
-        <div>
-            <h2 className="text-xl font-bold">{business.name}</h2>
-            <p>{business.description}</p>
+        <div className="py-1 px-1">
+                <h2 className="text-2xl font-bold mb-4">{business.name}</h2>
+                <p className="text-gray-700 mb-6">{business.description}</p>
         </div>
     );
 };

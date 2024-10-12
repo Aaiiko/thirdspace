@@ -5,5 +5,5 @@ type Business = {
     /** The description for the business */
     description : string;
     /** Business id */
-    id : number;
+    [key: string]: any;
 }

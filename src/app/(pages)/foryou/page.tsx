@@ -8,7 +8,7 @@ export default function forYouPage() {
         {
             id: 1,
             name: "McDonald's",
-            description: "Fast food chain"
+            description: "Fine Dining"
         },
         {
             id: 2,

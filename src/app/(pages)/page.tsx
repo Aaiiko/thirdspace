@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div>
+    <div className="the-fancy-background">
       <Toolbar/>
         <div className="py-11 flex flex-col items-center justify-center">
             <h2 className="text-center py-3 text-3xl">Food Tinder</h2>
