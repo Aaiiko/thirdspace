@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Toolbar from "../modules/Toolbar";
-import { Button, Input } from "@mui/material";
 //
 import { Metadata } from "next";
 
@@ -9,28 +8,25 @@ export const metadata: Metadata = {
   description: '...',
 }
 
+/** Business Users: Name, Email, Password?, Catagory */
+/** Users: Name, Email, Password?, Preferred Catagory, Price, Location */
 export default function Home() {
   return (
-    <div className="the-fancy-background">
-      <Toolbar/>
-        <div className="py-11 flex flex-col items-center justify-center">
-            <h2 className="text-center py-3 text-3xl">Food Tinder</h2>
-            <ChatInput />
-        </div>
-
-        <br/>
-        <h1 className="font-bold text-xl">Explore Buisnesses:</h1>
+    <div className="bg-[#f4f4f4]">
+      <Toolbar />
+      <div className="py-20 flex flex-col items-center justify-center">
+        <img src="/Phantom.svg" alt="Third Space Logo" className="w-1/3" />
+        <h2 className="text-center py-3 text-3xl font-bold">Welcome to Third Space!</h2>
+        <p>Your one stop shop for all your local eating needs!</p>
+        <br></br>
+        <Link href="/foryou"><button className="bg-black text-white py-2 px-4 rounded hover:bg-gray-700">
+          <p className="text-white">Let&apos;s Get Started!</p>
+        </button></Link>
+        <br></br>
+        <Link href="/mybusiness"><button className="bg-black text-white py-2 px-4 rounded hover:bg-gray-700">
+          <p className="text-white">I&apos;m A Business And I Want To Join!</p>
+        </button></Link>
+      </div>
     </div>
   );
 }
-
-const ChatInput = () => {
-
-  return (
-      <div>
-          <Input 
-              placeholder="Talk about yourself!" />&nbsp;
-          <Link href="/foryou"><Button className="bg-black text-white">Let's Get Started!</Button></Link>
-      </div>
-  );
-};
