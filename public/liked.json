@@ -1,0 +1,84 @@
+[
+    [
+        {
+            "name": "The Greek Taverna",
+            "description": "Authentic Greek cuisine with a modern twist.",
+            "review": 4.5,
+            "price": 3,
+            "location": "123 Main St, Springfield",
+            "category": "Greek",
+            "image": "https://images.squarespace-cdn.com/content/v1/5e484ab628c78d6f7e602d73/c828d00f-3184-44d0-9109-eea1b960075d/greek-foods-souvlaki.jpg",
+            "id": "1"
+        },
+        {
+            "name": "Pasta Palace",
+            "description": "Delicious Italian pasta dishes made fresh daily.",
+            "review": 4.7,
+            "price": 2,
+            "location": "456 Elm St, Springfield",
+            "category": "Italian",
+            "image": "https://images.unsplash.com/photo-1589308078054-832d9d2d6d1b",
+            "id": "2"
+        },
+        {
+            "name": "Sushi World",
+            "description": "A wide variety of sushi and sashimi prepared by expert chefs.",
+            "review": 4.8,
+            "price": 4,
+            "location": "789 Oak St, Springfield",
+            "category": "Japanese",
+            "image": "https://images.unsplash.com/photo-1553621042-f6e147245754",
+            "id": "3"
+        },
+        {
+            "name": "Burger Barn",
+            "description": "Juicy burgers with a variety of toppings and sides.",
+            "review": 4.3,
+            "price": 1,
+            "location": "101 Maple St, Springfield",
+            "category": "American",
+            "image": "https://images.unsplash.com/photo-1550547660-d9450f859349",
+            "id": "4"
+        },
+        {
+            "name": "Curry House",
+            "description": "Spicy and flavorful Indian curries and dishes.",
+            "review": 4.6,
+            "price": 3,
+            "location": "202 Pine St, Springfield",
+            "category": "Indian",
+            "image": "https://images.unsplash.com/photo-1604908177525-1b6ecb7b6f8b",
+            "id": "5"
+        },
+        {
+            "name": "Taco Town",
+            "description": "Tacos, burritos, and more with authentic Mexican flavors.",
+            "review": 4.4,
+            "price": 2,
+            "location": "303 Cedar St, Springfield",
+            "category": "Mexican",
+            "image": "https://images.unsplash.com/photo-1600891964599-f61ba0e24092",
+            "id": "6"
+        },
+        {
+            "name": "Vegan Delight",
+            "description": "Healthy and delicious vegan dishes made with fresh ingredients.",
+            "review": 4.9,
+            "price": 3,
+            "location": "404 Birch St, Springfield",
+            "category": "Vegan",
+            "image": "https://images.unsplash.com/photo-1543353071-087092ec393e",
+            "id": "7"
+        },
+        {
+            "name": "BBQ Haven",
+            "description": "Smoky and savory BBQ dishes with all the fixings.",
+            "review": 4.2,
+            "price": 2,
+            "location": "505 Walnut St, Springfield",
+            "category": "BBQ",
+            "image": "https://images.unsplash.com/photo-1552332386-f8dd00dc2f85",
+            "id": "8"
+        }
+    ]
+]

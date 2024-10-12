@@ -1,0 +1,52 @@
+[
+    {
+        "name": "Pasta Palace",
+        "description": "Delicious Italian pasta dishes made fresh daily.",
+        "review": 4.7,
+        "price": 2,
+        "location": "456 Elm St, Springfield",
+        "category": "Italian",
+        "image": "https://images.unsplash.com/photo-1589308078054-832d9d2d6d1b",
+        "id": "2"
+    },
+    {
+        "name": "Taco Haven",
+        "description": "Authentic Mexican tacos made with fresh ingredients and bold flavors.",
+        "review": 4.6,
+        "price": 1,
+        "location": "123 Main St, Springfield",
+        "category": "Mexican",
+        "image": "https://images.unsplash.com/photo-1575936123453-5e7f4a2a7f1c",
+        "id": "3"
+    },
+    {
+        "name": "Sushi Spot",
+        "description": "Freshly prepared sushi and sashimi, served with a smile.",
+        "review": 4.8,
+        "price": 3,
+        "location": "789 Oak St, Springfield",
+        "category": "Japanese",
+        "image": "https://images.unsplash.com/photo-1584170184824-45c3f5aa481b",
+        "id": "4"
+    },
+    {
+        "name": "Curry Corner",
+        "description": "Spicy Indian curries and naan, crafted with traditional recipes.",
+        "review": 4.5,
+        "price": 2,
+        "location": "321 Maple St, Springfield",
+        "category": "Indian",
+        "image": "https://images.unsplash.com/photo-1561656144-2b7e3ef0ed09",
+        "id": "5"
+    },
+    {
+        "name": "Burger Bar",
+        "description": "Gourmet burgers made to order with a variety of toppings.",
+        "review": 4.4,
+        "price": 2,
+        "location": "654 Pine St, Springfield",
+        "category": "American",
+        "image": "https://images.unsplash.com/photo-1527653194921-e28a69f12813",
+        "id": "6"
+    }
+]
