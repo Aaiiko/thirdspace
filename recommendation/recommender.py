@@ -4,6 +4,7 @@ from torch_geometric.nn import GCNConv, Linear
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 import torch.nn.functional as F
+import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 
 class GNN(torch.nn.Module):
@@ -33,7 +34,6 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
     all_data['Star'].fillna(3.5, inplace=True)
     #all_data = all_data.dropna(subset=['Area'])
 
-    
     # le_area = LabelEncoder()
     # all_data['Area_encoded'] = le_area.fit_transform(all_data['Area'])
     
@@ -180,16 +180,38 @@ def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restau
 
     return all_restaurants.iloc[final_indices]
 
+def generate_dummy_data():
+    np.random.seed(42)  # For reproducibility
+
+    restaurants = pd.DataFrame({
+        'Name': [f'Restaurant_{i}' for i in range(15)],
+        'Star': np.random.uniform(3, 5, 15).round(1),
+        'Price': np.random.choice(['$', '$$', '$$$', '$$$$'], 15),
+        'Category': np.random.choice(['Italian', 'Chinese', 'Mexican', 'American', 'Japanese'], 15),
+        'Services': [', '.join(np.random.choice(['Delivery', 'Takeout', 'Dine-in'], np.random.randint(1, 4), replace=False)) for _ in range(15)],
+        'Area': np.random.choice(['Downtown', 'Suburb', 'Uptown'], 15),
+        'Searched City': 'Seattle'
+    })
+
+    user_likes = restaurants.sample(n=3)
+    user_dislikes = restaurants[~restaurants['Name'].isin(user_likes['Name'])].sample(n=2)
+    all_restaurants = restaurants[~restaurants['Name'].isin(user_likes['Name']) & ~restaurants['Name'].isin(user_dislikes['Name'])]
+    print(user_likes)
+    print(user_dislikes)
+    return user_likes, user_dislikes, all_restaurants
+
 def main():
     min_stars = 3.0
     data_file = 'Restaurants_Seattle.csv'
     likes = 'Sample_User.xlsx'
     dislikes = 'User_dislikes.xlsx'
 
-    user_likes = pd.read_excel(likes)
-    user_dislikes = pd.read_excel(dislikes)
-    data = pd.read_csv(data_file)
-    data = data.drop_duplicates()
+    # user_likes = pd.read_excel(likes)
+    # user_dislikes = pd.read_excel(dislikes)
+    # data = pd.read_csv(data_file)
+    # data = data.drop_duplicates()
+
+    user_likes, user_dislikes, data = generate_dummy_data()
 
     feature_weights = {
         'Star_normalized': 1.0,
@@ -205,7 +227,7 @@ def main():
     train_model(model, graph_data, lr=0.01, weight_decay=0.001)
 
     # Adjust top k based on how often we retrain
-    recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, processed_data, top_k=10)
+    recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, processed_data, top_k=5)
     print(recommendations[['Name', 'Star', 'Price', 'Area', 'Category', 'Services', 'Searched City']])
 
     # READ IN NEW DATA

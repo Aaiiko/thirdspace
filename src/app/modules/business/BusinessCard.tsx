@@ -1,6 +1,4 @@
-"use client"
 
-import React, { useState } from "react";
 import { Business } from "@/types/BusinessTypes";
 
 export const BusinessCard = (business: Business) => {
