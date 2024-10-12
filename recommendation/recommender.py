@@ -25,15 +25,14 @@ class GNN(torch.nn.Module):
 def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, feature_weights=None):
     all_data = pd.concat([user_likes, user_dislikes, all_restaurants], ignore_index=True)
     all_data['review'].fillna(3.5, inplace=True)
-    all_data['star_diff'] = all_data['review'] - min_stars
-    all_data.drop_duplicates()
-    all_data.reset_index()
-    price_dict = {'$': 1, '$$': 2, '$$$': 3, '$$$$': 4, 'n/a': 2}
+    all_data = all_data[all_data['review'] >= min_stars]
+    all_data.drop_duplicates(inplace=True)
+    all_data.reset_index(drop=True, inplace=True)
     
+    price_dict = {'$': 1, '$$': 2, '$$$': 3, '$$$$': 4, 'n/a': 2}
     all_data['price'] = all_data['price'].map(price_dict)
     all_data['price'].fillna(2, inplace=True)
     
-
     all_data = all_data.dropna(subset=['location'])
     le_area = LabelEncoder()
     all_data['Area_encoded'] = le_area.fit_transform(all_data['location'])
@@ -41,22 +40,22 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
     category_vectorizer = CountVectorizer(tokenizer=lambda x: x.split(','), lowercase=False, token_pattern=None)
     category_encoded = category_vectorizer.fit_transform(all_data['category'])
     category_df = pd.DataFrame(category_encoded.toarray(), columns=category_vectorizer.get_feature_names_out())
-    category_df.fillna(0, inplace=True)
-
+    
     service_vectorizer = CountVectorizer(tokenizer=lambda x: x.split(','), lowercase=False, token_pattern=None)
     service_encoded = service_vectorizer.fit_transform(all_data['tags'])
     service_df = pd.DataFrame(service_encoded.toarray(), columns=service_vectorizer.get_feature_names_out())
-    service_df.fillna(0, inplace=True)
-
-    scaler = MinMaxScaler()
-    all_data[['Star_normalized', 'Price_normalized', 'star_diff_normalized', 'area']] = scaler.fit_transform(all_data[['review', 'price', 'star_diff', 'Area_encoded']])
     
-    all_data['Price_normalized'].fillna(0, inplace=True)
-    all_data['Star_normalized'].fillna(0, inplace=True)
-    all_data['star_diff_normalized'].fillna(0, inplace=True)
-
+    scaler = MinMaxScaler()
+    all_data['Review_normalized'] = scaler.fit_transform(all_data[['review']])
+    
+    user_avg_price = user_likes['price'].map(price_dict).mean()
+    all_data['Price_similarity'] = 1 / (1 + np.abs(all_data['price'] - user_avg_price))
+    
+    user_locations = user_likes['location'].unique()
+    all_data['Location_similarity'] = all_data['Area_encoded'].apply(lambda x: 1 if x in user_locations else 0)
+    
     feature_df = pd.concat([
-        all_data[['Price_normalized', 'star_diff_normalized', 'area']].reset_index(drop=True),
+        all_data[['Review_normalized', 'Price_similarity', 'Location_similarity']].reset_index(drop=True),
         category_df.reset_index(drop=True),
         service_df.reset_index(drop=True)
     ], axis=1)
@@ -67,9 +66,9 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
 
     if feature_weights is not None:
         weight_tensor = torch.FloatTensor([
-            #feature_weights['Star_normalized'],
+            feature_weights['Star_normalized'],
             feature_weights['Price_normalized'],
-            feature_weights['star_diff_normalized'],
+            #feature_weights['star_diff_normalized'],
             feature_weights['Area_encoded'],
             *([1] * category_df.shape[1]),
             *([1] * service_df.shape[1])
@@ -88,14 +87,14 @@ def create_graph(features, user_likes, user_dislikes):
     edge_index = []
     edge_types = [] 
 
- 
+
     for i in range(num_user_likes):
         for j in range(num_user_likes, num_total):
             edge_index.append([i, j])
             edge_index.append([j, i])
             edge_types.append(1)
 
-   
+
     for i in range(num_user_dislikes):
         for j in range(num_user_dislikes, num_total):
             edge_index.append([i + num_user_likes, j]) 
@@ -154,7 +153,7 @@ def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restau
         avg_dislike_embedding = user_embeddings[num_likes:num_user].mean(dim=0)
         avg_user_embedding = avg_user_embedding - 0.1 * avg_dislike_embedding
 
-    similarities = torch.mm(avg_user_embedding.unsqueeze(0), restaurant_embeddings.t()).squeeze()
+    similarities = torch.mm(user_embeddings.mean(dim=0).unsqueeze(0), restaurant_embeddings.t()).squeeze()
 
     scaled_similarities = similarities / temperature
 
@@ -162,6 +161,7 @@ def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restau
 
     num_samples = min(top_k * 2, len(probabilities))
     indices = torch.multinomial(probabilities, num_samples=num_samples, replacement=False)
+    _, indices = torch.sort(similarities, descending=True)
 
     seen_restaurants = set(user_likes['Name']).union(set(user_dislikes['Name']))
     final_indices = []
@@ -176,7 +176,7 @@ def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restau
     return all_restaurants.iloc[final_indices]
 
 def generate_dummy_data():
-    np.random.seed(42)  # For reproducibility
+    np.random.seed(43)  # For reproducibility
 
     restaurants = pd.DataFrame({
         'Name': [f'Restaurant_{i}' for i in range(15)],
@@ -210,7 +210,7 @@ def main():
 
     feature_weights = {
         'Star_normalized': 1.0,
-        'Price_normalized': 1.0,
+        'Price_normalized': 2.0,
         'star_diff_normalized': 1.0,
         'Area_encoded': 0.1,
         'Category': 1.0,
