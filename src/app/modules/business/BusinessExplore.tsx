@@ -20,6 +20,7 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
     const [currentB, setCurrentB] = useState<number>(0);
     const [rejected, setRejected] = useState<Business[]>([]);
     const [loved, setLoved] = useState<Business[]>([]);
+    const [businessArray, setBusinessArray] = useState<Business[]>(props.businesses);
     const touchStartX = useRef<number>(0);
     const touchEndX = useRef<number>(0);
 
@@ -119,19 +120,20 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
 
     /** After all businesses have been filtered through or there are none avalible  */
     if (currentB === -1 || props.businesses.length <= 0) {
-        return (
-            <div className="px-1 py-2">
-                <h1>You&apos;ve seen all the businesses in your area!</h1>
-                <p className="font-work-sans-regular text-4xl">Loved</p>
-                {loved.map((business) => (
-                    <BusinessCard {...business} />
-                ))}
-                <p className="font-work-sans-regular text-4xl">Rejected</p>
-                {rejected.map((business) => (
-                    <BusinessCard {...business} />
-                ))}
-            </div>
-        );
+        useEffect(() => {
+            const fetchBusinesses = async () => {
+                try {
+                    const response = await fetch('/foryou');
+                    const data = await response.json();
+                    setBusinessArray(data);
+                    setCurrentB(0);
+                } catch (error) {
+                    console.error('Error fetching businesses:', error);
+                }
+            };
+            fetchBusinesses();
+        }, []);
+        return (<div></div>);
     }
 
     return (
@@ -143,7 +145,7 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
         >
             <BusinessCard {...props.businesses[currentB]} />
             <div className="flex justify-between fixed bottom-0 left-0 right-0 p-4 bg-[#8ca9ad] z-50">
-              {isDesktop ? (
+              {isDesktop && (
                 <div className="flex w-full">
                   <button onClick={leftSwipe} className="flex-1 bg-red-500 text-white py-2 px-4 rounded hover:bg-gray-700 outline outline-[#f4f4f4]">
                     <ClearIcon />
@@ -152,11 +154,6 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
                   <button onClick={rightSwipe} className="flex-1 bg-green-500 text-white py-2 px-4 rounded hover:bg-gray-700 outline outline-[#f4f4f4]">
                     <CheckIcon />
                   </button>
-                </div>
-              ) : (
-                <div className="flex w-full">
-                  <div className="flex-1 text-center">Left is for losers</div>
-                  <div className="flex-1 text-center">Right is for winners! Tee hee</div>
                 </div>
               )}
             </div>
