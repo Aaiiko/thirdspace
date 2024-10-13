@@ -1,10 +1,7 @@
-"use client"
 
-import React, { useState } from "react";
 import { Business } from "@/types/BusinessTypes";
 
 export const BusinessCard = (business: Business) => {
-    const [test, setTest] = useState<number>(0);
 
     /** For rendering our stars grin */
     const renderStars = (rating: number) => {
@@ -39,7 +36,6 @@ export const BusinessCard = (business: Business) => {
                     <span className="ml-2 text-gray-600">{business.review}</span>
                 </div>
                 <p className="text-gray-700 mb-6">{business.description}</p>
-                <p>{test}</p>
             </div>
 
         </div>
