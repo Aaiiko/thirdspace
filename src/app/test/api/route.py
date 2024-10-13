@@ -202,15 +202,15 @@ app = Flask(__name__)
 
 @app.route('/foryou', methods=['GET', 'POST'])
 def make_for_you():
-    # user_likes = json_to_df(requests.get("http://localhost:3000/liked.json"))
-    # user_dislikes = json_to_df(requests.get("http://localhost:3000/rejected.json"))
-    # all_restaurants = json_to_df(requests.get("http://localhost:3000/new_businesses.json"))
-    # recommendations = get_recommendations_for_user(user_likes, user_dislikes, all_restaurants)
-    # data_dict = dict()
-    # for col in recommendations.columns:
-    #     data_dict[col] = recommendations[col].tolist()
+    user_likes = json_to_df(requests.get("http://localhost:3000/liked.json"))
+    user_dislikes = json_to_df(requests.get("http://localhost:3000/rejected.json"))
+    all_restaurants = json_to_df(requests.get("http://localhost:3000/new_businesses.json"))
+    recommendations = get_recommendations_for_user(user_likes, user_dislikes, all_restaurants)
+    data_dict = dict()
+    for col in recommendations.columns:
+        data_dict[col] = recommendations[col].tolist()
     # return jsonify(data_dict)
-    return jsonify(user_likes)
+    return jsonify(data_dict)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -32,7 +32,7 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
     // }, []);
 
     const fetchBusinesses = async () => {
-        const url = '/foryou';
+        const url = '/test/api';
         console.log("fetching businesses...");
         try{
             const response = await fetch(url);
