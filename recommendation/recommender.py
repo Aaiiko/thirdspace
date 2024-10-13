@@ -24,18 +24,20 @@ class GNN(torch.nn.Module):
 
 def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, feature_weights=None):
     all_data = pd.concat([user_likes, user_dislikes, all_restaurants], ignore_index=True)
-    all_data['review'].fillna(3.5, inplace=True)
-    all_data = all_data[all_data['review'] >= min_stars]
     all_data.drop_duplicates(inplace=True)
     all_data.reset_index(drop=True, inplace=True)
-    
+
+    all_data['review'].fillna(3.5, inplace=True)
+    all_data = all_data[all_data['review'] >= min_stars]
+    all_data['price'].fillna(2, inplace=True)
+
+    # removed price dict substitution
     #price_dict = {'$': 1, '$$': 2, '$$$': 3, '$$$$': 4, 'n/a': 2}
     #all_data['price'] = all_data['price'].map(price_dict)
-    all_data['price'].fillna(2, inplace=True)
-    
-    all_data = all_data.dropna(subset=['location'])
-    le_area = LabelEncoder()
-    all_data['Area_encoded'] = le_area.fit_transform(all_data['location'])
+
+    # all_data = all_data.dropna(subset=['location'])
+    # le_area = LabelEncoder()
+    # all_data['Area_encoded'] = le_area.fit_transform(all_data['location'])
     
     category_vectorizer = CountVectorizer(tokenizer=lambda x: x.split(','), lowercase=False, token_pattern=None)
     category_encoded = category_vectorizer.fit_transform(all_data['category'])
