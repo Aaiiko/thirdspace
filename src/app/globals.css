@@ -18,6 +18,10 @@
   color: black;
 }
 
+.moving-image {
+  animation: moveAcrossScreen 10s linear infinite;
+}
+
 
 /** Homepage BG **/
 @keyframes gradient {
