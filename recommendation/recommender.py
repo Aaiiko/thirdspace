@@ -51,11 +51,11 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
     user_avg_price = user_likes['price'].map(price_dict).mean()
     all_data['Price_similarity'] = 1 / (1 + np.abs(all_data['price'] - user_avg_price))
     
-    user_locations = user_likes['location'].unique()
-    all_data['Location_similarity'] = all_data['Area_encoded'].apply(lambda x: 1 if x in user_locations else 0)
+    # user_locations = user_likes['location'].unique()
+    # all_data['Location_similarity'] = all_data['Area_encoded'].apply(lambda x: 1 if x in user_locations else 0)
     
     feature_df = pd.concat([
-        all_data[['Review_normalized', 'Price_similarity', 'Location_similarity']].reset_index(drop=True),
+        all_data[['Review_normalized', 'Price_similarity']].reset_index(drop=True),
         category_df.reset_index(drop=True),
         service_df.reset_index(drop=True)
     ], axis=1)
@@ -68,8 +68,8 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
         weight_tensor = torch.FloatTensor([
             feature_weights['Star_normalized'],
             feature_weights['Price_normalized'],
-            #feature_weights['star_diff_normalized'],
-            feature_weights['Area_encoded'],
+            # feature_weights['star_diff_normalized'],
+            # feature_weights['Area_encoded'],
             *([1] * category_df.shape[1]),
             *([1] * service_df.shape[1])
         ]).unsqueeze(0)
@@ -211,8 +211,8 @@ def main():
     feature_weights = {
         'Star_normalized': 1.0,
         'Price_normalized': 2.0,
-        'star_diff_normalized': 1.0,
-        'Area_encoded': 0.1,
+        # 'star_diff_normalized': 1.0,
+        # 'Area_encoded': 0.1,
         'Category': 1.0,
         'Services': 1.0
     }
