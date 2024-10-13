@@ -10,8 +10,8 @@ export type Business = {
     price : number;
     /** Location */
     location : string;
-    /** The catagory of restraunt (i.e. Greek, Pizza, etc.) */
-    catagory : string;
+    /** The category of restraunt (i.e. Greek, Pizza, etc.) */
+    category : string;
     /** T */
     image : string|null;
     /** Business id */
