@@ -24,38 +24,39 @@ class GNN(torch.nn.Module):
 
 def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, feature_weights=None):
     all_data = pd.concat([user_likes, user_dislikes, all_restaurants], ignore_index=True)
-    all_data['star_diff'] = all_data['Star'] - min_stars
+    all_data['review'].fillna(3.5, inplace=True)
+    all_data['star_diff'] = all_data['review'] - min_stars
     all_data.drop_duplicates()
     all_data.reset_index()
     price_dict = {'$': 1, '$$': 2, '$$$': 3, '$$$$': 4, 'n/a': 2}
     
-    all_data['Price'] = all_data['Price'].map(price_dict)
-    all_data['Price'].fillna(2, inplace=True)
-    all_data['Star'].fillna(3.5, inplace=True)
-    #all_data = all_data.dropna(subset=['Area'])
+    all_data['price'] = all_data['price'].map(price_dict)
+    all_data['price'].fillna(2, inplace=True)
+    
 
-    # le_area = LabelEncoder()
-    # all_data['Area_encoded'] = le_area.fit_transform(all_data['Area'])
+    all_data = all_data.dropna(subset=['location'])
+    le_area = LabelEncoder()
+    all_data['Area_encoded'] = le_area.fit_transform(all_data['location'])
     
     category_vectorizer = CountVectorizer(tokenizer=lambda x: x.split(','), lowercase=False, token_pattern=None)
-    category_encoded = category_vectorizer.fit_transform(all_data['Category'])
+    category_encoded = category_vectorizer.fit_transform(all_data['category'])
     category_df = pd.DataFrame(category_encoded.toarray(), columns=category_vectorizer.get_feature_names_out())
     category_df.fillna(0, inplace=True)
 
     service_vectorizer = CountVectorizer(tokenizer=lambda x: x.split(','), lowercase=False, token_pattern=None)
-    service_encoded = service_vectorizer.fit_transform(all_data['Services'])
+    service_encoded = service_vectorizer.fit_transform(all_data['tags'])
     service_df = pd.DataFrame(service_encoded.toarray(), columns=service_vectorizer.get_feature_names_out())
     service_df.fillna(0, inplace=True)
 
     scaler = MinMaxScaler()
-    all_data[['Star_normalized', 'Price_normalized', 'star_diff_normalized']] = scaler.fit_transform(all_data[['Star', 'Price', 'star_diff']])
+    all_data[['Star_normalized', 'Price_normalized', 'star_diff_normalized', 'area']] = scaler.fit_transform(all_data[['review', 'price', 'star_diff', 'Area_encoded']])
     
     all_data['Price_normalized'].fillna(0, inplace=True)
     all_data['Star_normalized'].fillna(0, inplace=True)
     all_data['star_diff_normalized'].fillna(0, inplace=True)
 
     feature_df = pd.concat([
-        all_data[['Star_normalized', 'Price_normalized', 'star_diff_normalized']].reset_index(drop=True),
+        all_data[['Price_normalized', 'star_diff_normalized', 'area']].reset_index(drop=True),
         category_df.reset_index(drop=True),
         service_df.reset_index(drop=True)
     ], axis=1)
@@ -63,24 +64,18 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
     feature_df.drop_duplicates(inplace=True)
     features = feature_df.values
     features_tensor = torch.FloatTensor(features)
-    
+
     if feature_weights is not None:
+        weight_tensor = torch.FloatTensor([
+            #feature_weights['Star_normalized'],
+            feature_weights['Price_normalized'],
+            feature_weights['star_diff_normalized'],
+            feature_weights['Area_encoded'],
+            *([1] * category_df.shape[1]),
+            *([1] * service_df.shape[1])
+        ]).unsqueeze(0)
 
-        flat_weights = [
-            feature_weights.get('Star_normalized', 1.0),
-            feature_weights.get('Price_normalized', 1.0),
-            feature_weights.get('star_diff_normalized', 1.0),
-            feature_weights.get('Category', 1.0),
-            feature_weights.get('Services', 1.0)
-        ]
-
-        feature_weights_tensor = torch.FloatTensor(flat_weights).unsqueeze(0)
-
-        category_feature_count = category_df.shape[1]
-
-        features_tensor[:, 3:3 + category_feature_count] *= feature_weights_tensor[0, 3]
-        
-        features_tensor[:, 3 + category_feature_count:] *= feature_weights_tensor[0, 4]
+        features_tensor *= weight_tensor
 
     return features_tensor, all_data
 
@@ -105,7 +100,7 @@ def create_graph(features, user_likes, user_dislikes):
         for j in range(num_user_dislikes, num_total):
             edge_index.append([i + num_user_likes, j]) 
             edge_index.append([j, i + num_user_likes]) 
-            edge_types.append(-1) 
+            edge_types.append(-4) 
 
     edge_index = torch.LongTensor(edge_index).t().contiguous()
     edge_types = torch.tensor(edge_types, dtype=torch.float).view(-1, 1) 
@@ -157,7 +152,7 @@ def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restau
 
     if num_dislikes > 0:
         avg_dislike_embedding = user_embeddings[num_likes:num_user].mean(dim=0)
-        avg_user_embedding = avg_user_embedding - 0.5 * avg_dislike_embedding
+        avg_user_embedding = avg_user_embedding - 0.1 * avg_dislike_embedding
 
     similarities = torch.mm(avg_user_embedding.unsqueeze(0), restaurant_embeddings.t()).squeeze()
 
@@ -185,11 +180,11 @@ def generate_dummy_data():
 
     restaurants = pd.DataFrame({
         'Name': [f'Restaurant_{i}' for i in range(15)],
-        'Star': np.random.uniform(3, 5, 15).round(1),
-        'Price': np.random.choice(['$', '$$', '$$$', '$$$$'], 15),
-        'Category': np.random.choice(['Italian', 'Chinese', 'Mexican', 'American', 'Japanese'], 15),
-        'Services': [', '.join(np.random.choice(['Delivery', 'Takeout', 'Dine-in'], np.random.randint(1, 4), replace=False)) for _ in range(15)],
-        'Area': np.random.choice(['Downtown', 'Suburb', 'Uptown'], 15),
+        'review': np.random.uniform(3, 5, 15).round(1),
+        'price': np.random.choice(['$', '$$', '$$$', '$$$$'], 15),
+        'category': np.random.choice(['Italian', 'Chinese', 'Mexican', 'American', 'Japanese'], 15),
+        'tags': [', '.join(np.random.choice(['Delivery', 'Takeout', 'Dine-in'], np.random.randint(1, 4), replace=False)) for _ in range(15)],
+        'location': np.random.choice(['Downtown', 'Suburb', 'Uptown'], 15),
         'Searched City': 'Seattle'
     })
 
@@ -217,6 +212,7 @@ def main():
         'Star_normalized': 1.0,
         'Price_normalized': 1.0,
         'star_diff_normalized': 1.0,
+        'Area_encoded': 0.1,
         'Category': 1.0,
         'Services': 1.0
     }
@@ -228,7 +224,7 @@ def main():
 
     # Adjust top k based on how often we retrain
     recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, processed_data, top_k=5)
-    print(recommendations[['Name', 'Star', 'Price', 'Area', 'Category', 'Services', 'Searched City']])
+    print(recommendations[['Name', 'review', 'price', 'location', 'category', 'tags', 'Searched City']])
 
     # READ IN NEW DATA
     # model = retrain_model(model, graph_data, lr=0.01, weight_decay=0.001)
