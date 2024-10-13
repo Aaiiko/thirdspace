@@ -3,13 +3,11 @@
 import { Business } from "@/types/BusinessTypes";
 import React, { useState, useRef, useEffect } from "react";
 import { BusinessCard } from "./BusinessCard";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import { database } from "@../../../firebaseConfig";
 import { ref, set, get, child } from "firebase/database";
 import { useMediaQuery } from "@mui/material";
-
 
 
 interface BusinessExploreProps {

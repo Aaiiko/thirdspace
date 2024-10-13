@@ -1,0 +1,20 @@
+[{
+    "name": "Pizza Paradise",
+    "description": "Wood-fired pizzas with a variety of toppings and crusts.",
+    "review": 4.7,
+    "price": 2,
+    "location": "606 Chestnut St, Springfield",
+    "category": "Pizza",
+    "Searched City" : "Seattle",
+    "tags" : ["Italian", "Pasta", "Family-friendly"]
+},
+{
+    "name": "Seafood Shack",
+    "description": "Fresh and delicious seafood dishes with a coastal vibe.",
+    "review": 4.5,
+    "price": 4,
+    "location": "707 Spruce St, Springfield",
+    "category": "Seafood",
+    "Searched City" : "Seattle",
+    "tags" : ["Italian", "Pasta", "Family-friendly"]
+}]

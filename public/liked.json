@@ -1,0 +1,84 @@
+[
+    [
+        {
+            "name": "The Greek Taverna",
+            "description": "Authentic Greek cuisine with a modern twist.",
+            "review": 4.5,
+            "price": 3,
+            "location": "123 Main St, Springfield",
+            "category": "Greek",
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
+        },
+        {
+            "name": "Pasta Palace",
+            "description": "Delicious Italian pasta dishes made fresh daily.",
+            "review": 4.7,
+            "price": 2,
+            "location": "456 Elm St, Springfield",
+            "category": "Italian",
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
+        },
+        {
+            "name": "Sushi World",
+            "description": "A wide variety of sushi and sashimi prepared by expert chefs.",
+            "review": 4.8,
+            "price": 4,
+            "location": "789 Oak St, Springfield",
+            "category": "Japanese",
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
+        },
+        {
+            "name": "Burger Barn",
+            "description": "Juicy burgers with a variety of toppings and sides.",
+            "review": 4.3,
+            "price": 1,
+            "location": "101 Maple St, Springfield",
+            "category": "American",
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
+        },
+        {
+            "name": "Curry House",
+            "description": "Spicy and flavorful Indian curries and dishes.",
+            "review": 4.6,
+            "price": 3,
+            "location": "202 Pine St, Springfield",
+            "category": "Indian",
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
+        },
+        {
+            "name": "Taco Town",
+            "description": "Tacos, burritos, and more with authentic Mexican flavors.",
+            "review": 4.4,
+            "price": 2,
+            "location": "303 Cedar St, Springfield",
+            "category": "Mexican",
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
+        },
+        {
+            "name": "Vegan Delight",
+            "description": "Healthy and delicious vegan dishes made with fresh ingredients.",
+            "review": 4.9,
+            "price": 3,
+            "location": "404 Birch St, Springfield",
+            "category": "Vegan",
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
+        },
+        {
+            "name": "BBQ Haven",
+            "description": "Smoky and savory BBQ dishes with all the fixings.",
+            "review": 4.2,
+            "price": 2,
+            "location": "505 Walnut St, Springfield",
+            "category": "BBQ",
+            "Searched City" : "Seattle",
+            "tags" : ["Italian", "Pasta", "Family-friendly"]
+        }
+    ]
+]

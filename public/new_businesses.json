@@ -1,0 +1,53 @@
+[
+    {
+        "name": "Pasta Palace",
+        "description": "Delicious Italian pasta dishes made fresh daily.",
+        "review": 4.7,
+        "price": 2,
+        "location": "456 Elm St, Springfield",
+        "category": "Italian",
+        "Searched City" : "Seattle",
+        "tags" : ["Italian", "Pasta", "Family-friendly"]
+    },
+    {
+        "name": "Taco Haven",
+        "description": "Authentic Mexican tacos made with fresh ingredients and bold flavors.",
+        "review": 4.6,
+        "price": 1,
+        "location": "123 Main St, Springfield",
+        "category": "Mexican",
+        "Searched City" : "Seattle",
+        "tags" : ["Italian", "Pasta", "Family-friendly"]
+        
+    },
+    {
+        "name": "Sushi Spot",
+        "description": "Freshly prepared sushi and sashimi, served with a smile.",
+        "review": 4.8,
+        "price": 3,
+        "location": "789 Oak St, Springfield",
+        "category": "Japanese",
+        "Searched City" : "Seattle",
+        "tags" : ["Italian", "Pasta", "Family-friendly"]
+    },
+    {
+        "name": "Curry Corner",
+        "description": "Spicy Indian curries and naan, crafted with traditional recipes.",
+        "review": 4.5,
+        "price": 2,
+        "location": "321 Maple St, Springfield",
+        "category": "Indian",
+        "Searched City" : "Seattle",
+        "tags" : ["Italian", "Pasta", "Family-friendly"]
+    },
+    {
+        "name": "Burger Bar",
+        "description": "Gourmet burgers made to order with a variety of toppings.",
+        "review": 4.4,
+        "price": 2,
+        "location": "654 Pine St, Springfield",
+        "category": "American",
+        "Searched City" : "Seattle",
+        "tags" : ["Italian", "Pasta", "Family-friendly"]
+    }
+]
