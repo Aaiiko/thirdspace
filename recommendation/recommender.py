@@ -20,53 +20,6 @@ class GNN(torch.nn.Module):
         x = self.conv3(x, edge_index)
         x = self.linear(x)
         return x
-    
-def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, feature_weights=None):
-    all_data = pd.concat([user_likes, user_dislikes, all_restaurants], ignore_index=True)
-    all_data['star_diff'] = all_data['Star'] - min_stars
-    all_data.drop_duplicates()
-    all_data.reset_index()
-    price_dict = {'$': 1, '$$': 2, '$$$': 3, '$$$$': 4, 'n/a': 2}
-    
-    all_data['Price'] = all_data['Price'].map(price_dict)
-    all_data['Price'].fillna(2, inplace=True)
-    all_data['Star'].fillna(3.5, inplace=True)
-    #all_data = all_data.dropna(subset=['Area'])
-
-    # le_area = LabelEncoder()
-    # all_data['Area_encoded'] = le_area.fit_transform(all_data['Area'])
-    
-    category_vectorizer = CountVectorizer(tokenizer=lambda x: x.split(','), lowercase=False, token_pattern=None)
-    category_encoded = category_vectorizer.fit_transform(all_data['Category'])
-    category_df = pd.DataFrame(category_encoded.toarray(), columns=category_vectorizer.get_feature_names_out())
-    category_df.fillna(0, inplace=True)
-
-    service_vectorizer = CountVectorizer(tokenizer=lambda x: x.split(','), lowercase=False, token_pattern=None)
-    service_encoded = service_vectorizer.fit_transform(all_data['Services'])
-    service_df = pd.DataFrame(service_encoded.toarray(), columns=service_vectorizer.get_feature_names_out())
-    service_df.fillna(0, inplace=True)
-
-    scaler = MinMaxScaler()
-    all_data[['Star_normalized', 'Price_normalized', 'star_diff_normalized']] = scaler.fit_transform(all_data[['Star', 'Price', 'star_diff']])
-    
-    all_data['Price_normalized'].fillna(0, inplace=True)
-    all_data['Star_normalized'].fillna(0, inplace=True)
-    all_data['star_diff_normalized'].fillna(0, inplace=True)
-
-    feature_df = pd.concat([
-        all_data[['Star_normalized', 'Price_normalized', 'star_diff_normalized']].reset_index(drop=True),
-        category_df.reset_index(drop=True),
-        service_df.reset_index(drop=True)
-    ], axis=1)
-
-    feature_df.drop_duplicates(inplace=True)
-    features = feature_df.values
-    
-    if feature_weights is not None:
-        feature_weights_tensor = torch.FloatTensor(feature_weights).unsqueeze(0)
-        features_tensor *= feature_weights_tensor
-
-    return torch.FloatTensor(features), all_data
 
 def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, feature_weights=None):
     all_data = pd.concat([user_likes, user_dislikes, all_restaurants], ignore_index=True)
@@ -109,12 +62,27 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
 
     feature_df.drop_duplicates(inplace=True)
     features = feature_df.values
+    features_tensor = torch.FloatTensor(features)
     
     if feature_weights is not None:
-        feature_weights_tensor = torch.FloatTensor(feature_weights).unsqueeze(0)
-        features_tensor *= feature_weights_tensor
 
-    return torch.FloatTensor(features), all_data
+        flat_weights = [
+            feature_weights.get('Star_normalized', 1.0),
+            feature_weights.get('Price_normalized', 1.0),
+            feature_weights.get('star_diff_normalized', 1.0),
+            feature_weights.get('Category', 1.0),
+            feature_weights.get('Services', 1.0)
+        ]
+
+        feature_weights_tensor = torch.FloatTensor(flat_weights).unsqueeze(0)
+
+        category_feature_count = category_df.shape[1]
+
+        features_tensor[:, 3:3 + category_feature_count] *= feature_weights_tensor[0, 3]
+        
+        features_tensor[:, 3 + category_feature_count:] *= feature_weights_tensor[0, 4]
+
+    return features_tensor, all_data
 
 
 def create_graph(features, user_likes, user_dislikes):
@@ -145,7 +113,7 @@ def create_graph(features, user_likes, user_dislikes):
     return Data(x=features, edge_index=edge_index, edge_attr=edge_types)
 
 
-def train_model(model, graph_data, lr=0.01, weight_decay=0.001, num_epochs=100):
+def train_model(model, graph_data, lr=0.01, weight_decay=0.001, num_epochs=50):
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     criterion = torch.nn.MSELoss()
 
@@ -157,35 +125,65 @@ def train_model(model, graph_data, lr=0.01, weight_decay=0.001, num_epochs=100):
         loss.backward()
         optimizer.step()
 
+def retrain_model(model, graph_data, lr=0.005, weight_decay=0.0005, num_epochs=25):
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    criterion = torch.nn.MSELoss()
+
+    model.train()
+    for epoch in range(num_epochs):
+        optimizer.zero_grad()
+        out = model(graph_data.x, graph_data.edge_index)
+        loss = criterion(out, graph_data.x)
+        loss.backward()
+        optimizer.step()
     
-def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restaurants, top_k=50):
+    return model
+
+def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restaurants, top_k=50, temperature=1.0):
     model.eval()
     with torch.no_grad():
         node_embeddings = model(graph_data.x, graph_data.edge_index)
 
-    num_user = len(user_likes) + len(user_dislikes)
+    num_likes = len(user_likes)
+    num_dislikes = len(user_dislikes)
+    num_user = num_likes + num_dislikes
     user_embeddings = node_embeddings[:num_user]
     restaurant_embeddings = node_embeddings[num_user:]
 
-    noise = torch.normal(mean=0.0, std=0.2, size=user_embeddings.size())
-    noisy_user = user_embeddings + noise
+    # Calculate average user embedding
+    if num_likes > 0:
+        avg_user_embedding = user_embeddings[:num_likes].mean(dim=0)
+    else:
+        avg_user_embedding = torch.zeros_like(restaurant_embeddings[0])
 
-    similarities = torch.mm(noisy_user.mean(dim=0).unsqueeze(0), restaurant_embeddings.t())
-    
-    _, indices = torch.sort(similarities, descending=True)
+    if num_dislikes > 0:
+        avg_dislike_embedding = user_embeddings[num_likes:num_user].mean(dim=0)
+        avg_user_embedding = avg_user_embedding - 0.5 * avg_dislike_embedding
+
+    # Calculate similarities
+    similarities = torch.mm(avg_user_embedding.unsqueeze(0), restaurant_embeddings.t()).squeeze()
+
+    # Apply temperature scaling
+    scaled_similarities = similarities / temperature
+
+    # Convert to probabilities
+    probabilities = F.softmax(scaled_similarities, dim=0)
+
+    # Sample restaurants based on probabilities
+    num_samples = min(top_k * 2, len(probabilities))  # Sample more than needed
+    indices = torch.multinomial(probabilities, num_samples=num_samples, replacement=False)
 
     seen_restaurants = set(user_likes['Name']).union(set(user_dislikes['Name']))
     final_indices = []
     
-    for idx in indices.squeeze():
+    for idx in indices:
         restaurant_name = all_restaurants.iloc[idx.item()]['Name']
         if restaurant_name not in seen_restaurants and idx.item() not in final_indices:
             final_indices.append(idx.item())
             if len(final_indices) == top_k:
-                break  
+                break
 
     return all_restaurants.iloc[final_indices]
-
 
 def main():
     min_stars = 3.0
@@ -199,21 +197,26 @@ def main():
     data = data.drop_duplicates()
 
     feature_weights = {
-        'Star_normalized': 1.0,       # Give twice the importance to the star rating
-        'Price_normalized': 1.0,      # Normal importance to the price
-        'star_diff_normalized': 1.0,  # Give one and a half times the importance to star difference
+        'Star_normalized': 1.0,
+        'Price_normalized': 1.0,
+        'star_diff_normalized': 1.0,
         'Category': 1.0,
         'Services': 1.0
     }
-    features, processed_data = preprocess_data(user_likes, user_dislikes, data, min_stars)
+    features, processed_data = preprocess_data(user_likes, user_dislikes, data, min_stars, feature_weights)
     graph_data = create_graph(features, user_likes, user_dislikes)
 
     model = GNN(num_features=features.shape[1], hidden_channels=64)
     train_model(model, graph_data, lr=0.01, weight_decay=0.001)
 
     # Adjust top k based on how often we retrain
-    recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, processed_data, top_k=50)
-    print(recommendations)
+    recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, processed_data, top_k=10)
+    print(recommendations[['Name', 'Star', 'Price', 'Area', 'Category', 'Services', 'Searched City']])
+
+    # READ IN NEW DATA
+    # model = retrain_model(model, graph_data, lr=0.01, weight_decay=0.001)
+    # recommendations = get_recommendations(model, graph_data, user_likes, user_dislikes, processed_data, top_k=10)
+    # print(recommendations[['Name', 'Star', 'Price', 'Area', 'Category', 'Services', 'Searched City']])
 
 if __name__ == "__main__":
     main()
