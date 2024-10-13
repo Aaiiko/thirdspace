@@ -133,7 +133,7 @@ def retrain_model(model, graph_data, lr=0.005, weight_decay=0.0005, num_epochs=2
     
     return model
 
-def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restaurants, top_k=50, temperature=1.0):
+def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restaurants, top_k=5, temperature=1.0):
     model.eval()
     with torch.no_grad():
         node_embeddings = model(graph_data.x, graph_data.edge_index)
