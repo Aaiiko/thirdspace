@@ -29,8 +29,8 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
     all_data.drop_duplicates(inplace=True)
     all_data.reset_index(drop=True, inplace=True)
     
-    price_dict = {'$': 1, '$$': 2, '$$$': 3, '$$$$': 4, 'n/a': 2}
-    all_data['price'] = all_data['price'].map(price_dict)
+    #price_dict = {'$': 1, '$$': 2, '$$$': 3, '$$$$': 4, 'n/a': 2}
+    #all_data['price'] = all_data['price'].map(price_dict)
     all_data['price'].fillna(2, inplace=True)
     
     all_data = all_data.dropna(subset=['location'])
@@ -48,7 +48,7 @@ def preprocess_data(user_likes, user_dislikes, all_restaurants, min_stars, featu
     scaler = MinMaxScaler()
     all_data['Review_normalized'] = scaler.fit_transform(all_data[['review']])
     
-    user_avg_price = user_likes['price'].map(price_dict).mean()
+    user_avg_price = user_likes['price'].mean()
     all_data['Price_similarity'] = 1 / (1 + np.abs(all_data['price'] - user_avg_price))
     
     # user_locations = user_likes['location'].unique()
@@ -181,7 +181,7 @@ def generate_dummy_data():
     restaurants = pd.DataFrame({
         'Name': [f'Restaurant_{i}' for i in range(15)],
         'review': np.random.uniform(3, 5, 15).round(1),
-        'price': np.random.choice(['$', '$$', '$$$', '$$$$'], 15),
+        'price': np.random.randint(1, 5, 15),
         'category': np.random.choice(['Italian', 'Chinese', 'Mexican', 'American', 'Japanese'], 15),
         'tags': [', '.join(np.random.choice(['Delivery', 'Takeout', 'Dine-in'], np.random.randint(1, 4), replace=False)) for _ in range(15)],
         'location': np.random.choice(['Downtown', 'Suburb', 'Uptown'], 15),
