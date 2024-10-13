@@ -150,7 +150,6 @@ def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restau
     user_embeddings = node_embeddings[:num_user]
     restaurant_embeddings = node_embeddings[num_user:]
 
-    # Calculate average user embedding
     if num_likes > 0:
         avg_user_embedding = user_embeddings[:num_likes].mean(dim=0)
     else:
@@ -160,17 +159,13 @@ def get_recommendations(model, graph_data, user_likes, user_dislikes, all_restau
         avg_dislike_embedding = user_embeddings[num_likes:num_user].mean(dim=0)
         avg_user_embedding = avg_user_embedding - 0.5 * avg_dislike_embedding
 
-    # Calculate similarities
     similarities = torch.mm(avg_user_embedding.unsqueeze(0), restaurant_embeddings.t()).squeeze()
 
-    # Apply temperature scaling
     scaled_similarities = similarities / temperature
 
-    # Convert to probabilities
     probabilities = F.softmax(scaled_similarities, dim=0)
 
-    # Sample restaurants based on probabilities
-    num_samples = min(top_k * 2, len(probabilities))  # Sample more than needed
+    num_samples = min(top_k * 2, len(probabilities))
     indices = torch.multinomial(probabilities, num_samples=num_samples, replacement=False)
 
     seen_restaurants = set(user_likes['Name']).union(set(user_dislikes['Name']))
