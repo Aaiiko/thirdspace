@@ -1,4 +1,5 @@
 from flask import Flask, requests, jsonify, Response
+import json
 import torch
 from torch_geometric.data import Data
 from torch_geometric.nn import GCNConv, Linear
@@ -199,13 +200,17 @@ def json_to_df(json_data):
 
 app = Flask(__name__)
 
-@app.route('/foryou', methods=['GET'])
+@app.route('/foryou', methods=['GET', 'POST'])
 def make_for_you():
-    user_likes = json_to_df(requests.get("http://localhost:3000/liked.json"))
-    user_dislikes = json_to_df(requests.get("http://localhost:3000/rejected.json"))
-    all_restaurants = json_to_df(requests.get("http://localhost:3000/new_businesses.json"))
-    recommendations = get_recommendations_for_user(user_likes, user_dislikes, all_restaurants)
-    return Response(recommendations.to_json(orient="records"), mimetype='application/json')
+    # user_likes = json_to_df(requests.get("http://localhost:3000/liked.json"))
+    # user_dislikes = json_to_df(requests.get("http://localhost:3000/rejected.json"))
+    # all_restaurants = json_to_df(requests.get("http://localhost:3000/new_businesses.json"))
+    # recommendations = get_recommendations_for_user(user_likes, user_dislikes, all_restaurants)
+    # data_dict = dict()
+    # for col in recommendations.columns:
+    #     data_dict[col] = recommendations[col].tolist()
+    # return jsonify(data_dict)
+    return jsonify({"message": "Hello World!"})
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -5,22 +5,30 @@ import Toolbar from "@/app/modules/Toolbar";
 import { Business } from "@/types/BusinessTypes";
 import { Metadata } from "next";
 import { useState, useEffect } from "react";
+import { database } from "@../../../firebaseConfig";
+import { ref, set, get, child } from "firebase/database";
 
 
 export default function forYouPage() {
     const [businesses, setBusinesses] = useState<Business[]>([]);
 
+    const readUnseenBusinesses = async () => {
+        const dbRef = ref(database);
+        const snapshot = await get(child(dbRef, 'unseen'));
+        if (snapshot.exists()) {
+            return snapshot.val();
+        } else {
+            console.log("No rejected businesses available");
+            return [];
+        }
+    };
+
     useEffect(() => {
-        const fetchBusinesses = async () => {
-            try {
-                const response = await fetch('/liked.json');
-                const data = await response.json();
-                setBusinesses(data);
-            } catch (error) {
-                console.error('Error fetching businesses:', error);
-            }
-        };
-        fetchBusinesses();
+        const loadBusinesses = async () => {
+        const daBusinesses: Business[] = await readUnseenBusinesses();
+        setBusinesses(daBusinesses);
+        }
+        loadBusinesses();
     }, []);
 
     return (

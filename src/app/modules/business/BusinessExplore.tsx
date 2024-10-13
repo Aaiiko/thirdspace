@@ -24,6 +24,26 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
     const touchStartX = useRef<number>(0);
     const touchEndX = useRef<number>(0);
 
+    // useEffect(() => {
+    //     if (currentB === props.businesses.length - 1) {
+    //         return;
+    //     }
+    //     fetchBusinesses();
+    // }, []);
+
+    const fetchBusinesses = async () => {
+        const url = '/foryou';
+        console.log("fetching businesses...");
+        fetch(url)
+            .then(response => response.json())
+            .then (data => {
+                console.log(data);
+                setBusinessArray(data)
+                setCurrentB(0);
+        })
+        .catch(error => console.error("Error: ", error));
+    }
+
     /** Function to save loved business to Firebase */
     const saveLovedBusiness = (business: Business) => {
         set(ref(database, 'loved/' + business.id), business);
@@ -72,6 +92,10 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
         } else {
             setCurrentB(currentB + 1);
         }
+        if (currentB === 5){
+            console.log("hey wassup")
+            fetchBusinesses();
+        }
     };
 
     /** The event that happens on a left swipe */
@@ -87,6 +111,10 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
             setCurrentB(-1);
         } else {
             setCurrentB(currentB + 1);
+        }
+        if (currentB === 5){
+            console.log("hey wassup")
+            fetchBusinesses();
         }
     };
 
@@ -118,22 +146,15 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
         loadBusinesses();
     }, []);
 
+    if (currentB === 5){
+        <p>Loading...</p>
+    }
+
     /** After all businesses have been filtered through or there are none avalible  */
     if (currentB === -1 || props.businesses.length <= 0) {
-        useEffect(() => {
-            const fetchBusinesses = async () => {
-                try {
-                    const response = await fetch('/foryou');
-                    const data = await response.json();
-                    setBusinessArray(data);
-                    setCurrentB(0);
-                } catch (error) {
-                    console.error('Error fetching businesses:', error);
-                }
-            };
-            fetchBusinesses();
-        }, []);
-        return (<div></div>);
+        return (<div>
+            <h1 className="text-2xl text-center">Congrats! You've swiped through all the businesses in your area!</h1>
+        </div>);
     }
 
     return (
