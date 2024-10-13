@@ -1,18 +1,16 @@
 "use client"
 
 import { BusinessExplore } from "@/app/modules/business/BusinessExplore";
-import Toolbar from "@/app/modules/Toolbar";
 import { Business } from "@/types/BusinessTypes";
-import { Metadata } from "next";
 import { useState, useEffect } from "react";
 import { database } from "@../../../firebaseConfig";
-import { ref, set, get, child } from "firebase/database";
+import { ref, get, child } from "firebase/database";
 
 
 export default function forYouPage() {
     const [businesses, setBusinesses] = useState<Business[]>([]);
 
-    const readUnseenBusinesses = async () => {
+    const useReadUnseenBusinesses = async () => {
         const dbRef = ref(database);
         const snapshot = await get(child(dbRef, 'unseen'));
         if (snapshot.exists()) {
@@ -25,7 +23,7 @@ export default function forYouPage() {
 
     useEffect(() => {
         const loadBusinesses = async () => {
-        const daBusinesses: Business[] = await readUnseenBusinesses();
+        const daBusinesses: Business[] = await useReadUnseenBusinesses();
         setBusinesses(daBusinesses);
         }
         loadBusinesses();

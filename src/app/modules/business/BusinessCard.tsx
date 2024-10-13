@@ -16,6 +16,19 @@ export const BusinessCard = (business: Business) => {
         return stars;
     };
 
+        /** For rendering our grin */
+        const renderDollar = (rating: number) => {
+            const stars = [];
+            for (let i = 1; i <= rating; i++) {
+                stars.push(
+                    <span key={i} className="font-bold">
+                        $
+                    </span>
+                );
+            }
+            return stars;
+        };
+
     return (
         <div className="bg-[#f4f4f4] rounded-lg w-full" key={business.id} style={{ width: "100%" }} >
             <img
@@ -35,10 +48,12 @@ export const BusinessCard = (business: Business) => {
                     {renderStars(business.review)}
                     <span className="ml-2 text-gray-600 text-[#8ca9ad]">{business.review}</span>
                 </div>
+                <div className="flex items-center mb-4">
+                    {renderDollar(business.review)}
+                    <span className="ml-2 text-gray-600 text-[#8ca9ad]">{business.review}</span>
+                </div>
                 <p className="text-xl text-[#365b6d] font-bold">About</p>
                 <p className="text-[#8ca9ad] mb-6">{business.description}</p>
-                <p className="text-xl text-[#365b6d] font-bold">Tags:</p>
-                <p className="text-[#8ca9ad] mb-6">Robert Loved, Alice Hated, Fergus Approved, Kyle Tolerated</p>
                 {/* {business.tags.map(tag => (
                     <p className="text-[#8ca9ad] mb-6">{tag}</p>
                 ))} */}

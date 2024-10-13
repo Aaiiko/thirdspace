@@ -34,14 +34,17 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
     const fetchBusinesses = async () => {
         const url = '/foryou';
         console.log("fetching businesses...");
-        fetch(url)
-            .then(response => response.json())
-            .then (data => {
-                console.log(data);
-                setBusinessArray(data)
+        try{
+            const response = await fetch(url);
+            const data = await response.json();
+            console.log(data);
+            if (data) {
+                setBusinessArray(data);
                 setCurrentB(0);
-        })
-        .catch(error => console.error("Error: ", error));
+            }
+        } catch (error) {
+            console.log("Error fetching businesses: ", error);
+        }
     }
 
     /** Function to save loved business to Firebase */
@@ -92,8 +95,9 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
         } else {
             setCurrentB(currentB + 1);
         }
+        console.log(currentB);
         if (currentB === 5){
-            console.log("hey wassup")
+            console.log("hey wassup");
             fetchBusinesses();
         }
     };
@@ -112,8 +116,9 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
         } else {
             setCurrentB(currentB + 1);
         }
+        console.log(currentB);
         if (currentB === 5){
-            console.log("hey wassup")
+            console.log("hey wassup");
             fetchBusinesses();
         }
     };
@@ -147,7 +152,14 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
     }, []);
 
     if (currentB === 5){
-        <p>Loading...</p>
+        return (
+            <div>
+                <p>Loading...</p>
+                <button onClick={fetchBusinesses}>Fetch More</button>
+            </div>
+
+        );
+       
     }
 
     /** After all businesses have been filtered through or there are none avalible  */

@@ -210,7 +210,7 @@ def make_for_you():
     # for col in recommendations.columns:
     #     data_dict[col] = recommendations[col].tolist()
     # return jsonify(data_dict)
-    return jsonify({"message": "Hello World!"})
+    return jsonify(user_likes)
 
 if __name__ == '__main__':
     app.run(debug=True)
