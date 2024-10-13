@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400&display=swap');
+
+.font-work-sans-regular {
+    font-family: 'Work Sans', sans-serif;
+}
 /** Toolbar Styling **/
 .toolbar {
   top: 0;
@@ -9,21 +14,10 @@
   width: 100%;
   display: flex;
   padding: 10px;
-  background: lightgray;
+  background: #f4f4f4;
   color: black;
 }
 
-.the-fancy-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: white;
-  background-size: 400% 400%;
-  animation: gradient 6s ease infinite;
-  z-index: -1; /* Ensure it stays in the background */
-}
 
 /** Homepage BG **/
 @keyframes gradient {
@@ -40,7 +34,7 @@
 
 
 :root {
-  --background: #ffffff;
+  --background: #f4f4f4;
   --foreground: #171717;
 }
 

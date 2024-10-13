@@ -1,9 +1,10 @@
 "use client"
 
-
-import React, { useState, useEffect, useRef } from "react";
+import { Business } from "@/types/BusinessTypes";
+import React, { useState, useRef } from "react";
 import { BusinessCard } from "./BusinessCard";
-import { Button } from "@mui/material";
+
+
 
 
 interface BusinessExploreProps {
@@ -60,14 +61,14 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
     if (currentB === -1 || props.businesses.length <= 0) {
         return (
             <div className="px-1 py-2">
-                <h1>You've seen all the businesses in your area!</h1>
-                <p className="font-bold text-4xl">Loved</p>
+                <h1>You&apos;ve seen all the businesses in your area!</h1>
+                <p className="font-work-sans-regular text-4xl">Loved</p>
                 {loved.map((business) => (
-                    <BusinessCard business={business} />
+                    <BusinessCard {...business} key={business.id}/>
                 ))}
-                <p className="font-bold text-4xl">Rejected</p>
+                <p className="font-work-sans-regular text-4xl">Rejected</p>
                 {rejected.map((business) => (
-                    <BusinessCard business={business} />
+                    <BusinessCard {...business} key={business.id}/>
                 ))}
             </div>
         );
@@ -81,11 +82,8 @@ export const BusinessExplore = (props: BusinessExploreProps) => {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
-            <div className="p-8 bg-white shadow-lg rounded-lg max-w-md w-full">
-                <h2 className="text-2xl font-bold mb-4">{props.businesses[currentB]?.name}</h2>
-                <p className="text-gray-700 mb-6">{props.businesses[currentB]?.description}</p>
-            </div>
-            <div className="button-container flex justify-between sticky bottom-0 left-0 right-0 p-4 bg-white">
+            <BusinessCard {...props.businesses[currentB]} />
+            <div className="button-container flex justify-between sticky bottom-0 left-0 right-0 p-4 bg-[#f4f4f4]">
                 <div>
                     <button onClick={leftSwipe} className="bg-black text-white py-2 px-4 rounded hover:bg-gray-700">
                         Left Swipe

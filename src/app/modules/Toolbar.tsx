@@ -4,12 +4,12 @@ import Link from 'next/link';
 export const Toolbar: React.FC = () => {
 
   return (
-    <div className="toolbar" style={{ position: 'fixed', zIndex: 100, justifyContent: 'space-between', }}>
+    <div className="toolbar" style={{ position: 'fixed', zIndex: 100, justifyContent: 'space-between'}}>
       <Link href="/" className="flex items-center font-bold">
-        Insert Logo Here
+        <img src="/Phantom.svg" alt="Third Space Logo" className="h-10" />
       </Link>
       <div className="flex justify-end space-x-4">
-        <Link href="/foryou"><h3 className="font-bold">Explore</h3></Link>
+        
       </div>
     </div>
   );
